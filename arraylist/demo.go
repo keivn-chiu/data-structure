@@ -31,12 +31,15 @@ func NewArrayList() *ArrayList {
 
 // Insert
 func (arr *ArrayList) Insert(val interface{}, index int) error {
-	// todo
-	if err := arr.checkIndexValid(index); err != nil {
-		return err
+	if index < 0 {
+		return errors.New("index invalid")
 	}
 	if arr.checkIfFull() {
-		arr.increaseCap()
+		if index > cap(arr.data)*2 {
+			arr.increaseCap(index + cap(arr.data)*2)
+		} else {
+			arr.increaseCap(cap(arr.data) * 2)
+		}
 	}
 	tmp := arr.data[index:]
 	arr.data = append(arr.data[:index], val)
@@ -100,8 +103,8 @@ func (arr *ArrayList) checkIfFull() bool {
 }
 
 // increaseCap to increase capacity
-func (arr *ArrayList) increaseCap() {
+func (arr *ArrayList) increaseCap(size int) {
 	var tmp []interface{}
-	arr.data, tmp = make([]interface{}, cap(arr.data), cap(arr.data)*2), arr.data
+	arr.data, tmp = make([]interface{}, size, cap(arr.data)*2), arr.data
 	copy(arr.data, tmp) // keep origin data
 }
